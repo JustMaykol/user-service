@@ -14,6 +14,8 @@ class UserRepository {
 			it[id] = UUID.randomUUID().toString()
 			it[name] = user.name
 			it[password] = user.password
+			it[money] = user.money
+			it[admin] = user.admin
 		}
 	}
 
@@ -29,6 +31,8 @@ class UserRepository {
 		UserTable.update({ UserTable.id eq id }) {
 			it[name] = user.name
 			it[password] = user.password
+			it[money] = user.money
+			it[admin] = user.admin
 		} > 0
 	}
 
@@ -40,7 +44,10 @@ class UserRepository {
 		UserModel(
 			id = row[UserTable.id],
 			name = row[UserTable.name],
-			password = row[UserTable.password]
+			password = row[UserTable.password],
+
+			money = row[UserTable.money],
+			admin = row[UserTable.admin]
 		)
 
 }
