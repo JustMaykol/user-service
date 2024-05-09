@@ -7,6 +7,6 @@ object UserTable : Table() {
 	val name = varchar("name", 255)
 	val password = varchar("password", 255)
 
-	val money = integer("money")
-	val admin = bool("admin")
+	val money = integer("money").default(0)
+	val admin = bool("admin").default(false)
 }
