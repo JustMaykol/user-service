@@ -24,10 +24,16 @@ db = client['current']['user']
 
 # user crud
 
-@app.post('/user', description="Method to create a new User")
+@app.post(
+    '/user',
+    description='Creates a new user with the provided name, password, money, and admin status.',
+    response_description='Returns a success message upon creation.',
+)
 async def create_user(user: User):
+    user_id = str(uuid4())
+
     db.insert_one({
-        '_id': str(uuid4()),
+        '_id': user_id,
 
         'name': user.name,
         'password': user.password,
@@ -36,12 +42,16 @@ async def create_user(user: User):
         'admin': user.admin
     })
 
-    return {'message': 'created'}, 200
+    return {'message': f'created: {user_id}'}, 200
 
 
-@app.get('/user/{_id}', description="Method to read a User by id")
-async def read_user(_id: str):
-    document = db.find_one({'_id': _id})
+@app.get(
+    '/user/{user_id}',
+    description='Retrieves a user\'s with the specified ID.',
+    response_description='Returns the user information if found, or a message indicating that the user was not found.',
+)
+async def read_user(user_id: str):
+    document = db.find_one({'_id': user_id})
 
     if not document:
         return {'message': 'user not found'}, 404
@@ -49,14 +59,18 @@ async def read_user(_id: str):
     return document, 200
 
 
-@app.put('/user/{_id}', description="Method to update a User by id")
-async def update_user(_id: str, user: User):
-    document = db.find_one({'_id': _id})
+@app.put(
+    '/user/{user_id}',
+    description='Updates the information of an existing user with the specified ID.',
+    response_description='Returns a success message upon updating, or a message indicating that the user was not found.'
+)
+async def update_user(user_id: str, user: User):
+    document = db.find_one({'_id': user_id})
 
     if not document:
         return {'message': 'user not found'}, 404
 
-    db.update_one({'_id': _id}, {
+    db.update_one({'_id': user_id}, {
         '$set': {
             'name': user.name,
             'password': user.password,
@@ -66,26 +80,34 @@ async def update_user(_id: str, user: User):
         }
     })
 
-    return {'message': 'updated'}, 200
+    return {'message': f'updated: {document['_id']}'}, 200
 
 
-@app.delete('/user/{_id}', description="Method to delete a User by id")
-async def delete_user(_id):
-    document = db.find_one({'_id': _id})
+@app.delete(
+    '/user/{user_id}',
+    description='Deletes a user with the specified ID.',
+    response_description='Returns a success message upon deletion, or a message indicating that the user was not found.'
+)
+async def delete_user(user_id):
+    document = db.find_one({'_id': user_id})
 
     if not document:
         return {'message': 'user not found'}, 404
 
-    db.delete_one({'_id': _id})
+    db.delete_one({'_id': user_id})
 
-    return {'message': 'deleted'}, 200
-
-
-# user search
+    return {'message': f'deleted: {document['_id']}'}, 200
 
 
-@app.get('/user/', description="Method to collect all Users")
-async def read_user():
+# users search
+
+
+@app.get(
+    '/users/',
+    description='Retrieves a list of all users.',
+    response_description='Returns the list of users if not empty, or a message indicating that the list is empty.'
+)
+async def read_users():
     users = list(db.find())
 
     if not users:
@@ -96,12 +118,15 @@ async def read_user():
 
 # login
 
-@app.post('/login', description='Method to validate Login')
+@app.post(
+    '/login',
+    description='Validates user credentials \'name and password\' against the database.',
+    response_description='Returns the user ID if the login is successful, or a message indicating an invalid login.'
+)
 async def login(name: str, password: str):
     document = db.find_one({'name': name, 'password': password})
 
     if not document:
-        return {'message': 'invalid login'}, 401
+        return {'message': 'invalid login'}, 404
 
-    # change to user id
-    return {'message': 'valid login'}, 200
+    return document['_id'], 200

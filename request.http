@@ -1,4 +1,6 @@
-@id = fc87c98d-3c59-4e50-9e03-74ade5e25ea4
+@user_id = 7e7f96f9-b2bd-4f70-b6a1-30ffc328f242
+
+###
 
 POST http://127.0.0.1:8000/user
 Content-Type: application/json
@@ -9,4 +11,32 @@ Content-Type: application/json
   "money": 0,
   "admin": false
 }
+
+###
+
+GET http://127.0.0.1:8000/user/{{user_id}}
+
+###
+
+PUT http://127.0.0.1:8000/user/{{user_id}}
+Content-Type: application/json
+
+{
+  "name": "Jon",
+  "password": "Doe",
+  "money": 1000,
+  "admin": false
+}
+
+###
+
+DELETE http://127.0.0.1:8000/user/{{user_id}}
+
+###
+
+GET http://127.0.0.1:8000/users
+
+###
+
+POST http://127.0.0.1:8000/login/{{user_id}}
 
