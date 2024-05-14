@@ -1,7 +1,7 @@
 from uuid import uuid4
-from pydantic import BaseModel
 
 from fastapi import FastAPI
+from pydantic import BaseModel
 from pymongo import MongoClient
 
 app = FastAPI(
@@ -80,7 +80,7 @@ async def update_user(user_id: str, user: User):
         }
     })
 
-    return {'message': f'updated: {document['_id']}'}, 200
+    return {'message': f'updated: {user_id}'}, 200
 
 
 @app.delete(
@@ -96,7 +96,7 @@ async def delete_user(user_id):
 
     db.delete_one({'_id': user_id})
 
-    return {'message': f'deleted: {document['_id']}'}, 200
+    return {'message': f'deleted: {user_id}'}, 200
 
 
 # users search
