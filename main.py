@@ -32,7 +32,7 @@ client = MongoClient('mongodb://localhost:27017/')
 db = client['current']['user']
 
 
-# user crud
+# user create
 
 @app.post(
     '/user',
@@ -48,11 +48,14 @@ async def create_user(user: User):
         'name': user.name,
         'password': user.password,
 
-        'money': 0,
-        'admin': False
+        'money': user.money,
+        'admin': user.admin
     })
 
     return {'message': f'created: {user_id}'}, 200
+
+
+# user read
 
 
 @app.get(
@@ -67,6 +70,9 @@ async def read_user(user_id: str):
         return {'message': f'user \'{user_id}\'  not found'}, 404
 
     return document, 200
+
+
+# user update
 
 
 @app.put(
@@ -91,6 +97,9 @@ async def update_user(user_id: str, user: User):
     })
 
     return {'message': f'updated: {user_id}'}, 200
+
+
+# user delete
 
 
 @app.delete(
@@ -126,7 +135,32 @@ async def read_users():
     return users
 
 
+# register
+
+
+@app.post(
+    '/register',
+    description='Creates a new user with the provided name, password.',
+    response_description='Returns a success message upon creation.',
+)
+async def create_user(user: User):
+    user_id = str(uuid4())
+
+    db.insert_one({
+        '_id': user_id,
+
+        'name': user.name,
+        'password': user.password,
+
+        'money': 0,
+        'admin': False
+    })
+
+    return {'message': f'created: {user_id}'}, 200
+
+
 # login
+
 
 @app.post(
     '/login',
