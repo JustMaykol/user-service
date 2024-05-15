@@ -28,8 +28,11 @@ class User(BaseModel):
     admin: bool = False
 
 
-client = MongoClient('mongodb://localhost:27017/')
-db = client['current']['user']
+try:
+    client = MongoClient('mongodb://localhost:27017/')
+    db = client['current']['purchase']
+except Exception as exception:
+    print(f"Error connecting to MongoDB: {exception}")
 
 
 # user create
