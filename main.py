@@ -1,7 +1,9 @@
 from uuid import uuid4
+from pydantic import BaseModel
 
 from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+
 from pymongo import MongoClient
 
 app = FastAPI(
@@ -9,13 +11,21 @@ app = FastAPI(
     description='User API with FastAPI and MongoDB',
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*'],
+)
+
 
 class User(BaseModel):
     name: str
     password: str
 
-    money: int
-    admin: bool
+    money: int = 0
+    admin: bool = False
 
 
 client = MongoClient('mongodb://localhost:27017/')
@@ -38,8 +48,8 @@ async def create_user(user: User):
         'name': user.name,
         'password': user.password,
 
-        'money': user.money,
-        'admin': user.admin
+        'money': 0,
+        'admin': False
     })
 
     return {'message': f'created: {user_id}'}, 200
@@ -54,7 +64,7 @@ async def read_user(user_id: str):
     document = db.find_one({'_id': user_id})
 
     if not document:
-        return {'message': 'user not found'}, 404
+        return {'message': f'user \'{user_id}\'  not found'}, 404
 
     return document, 200
 
@@ -68,7 +78,7 @@ async def update_user(user_id: str, user: User):
     document = db.find_one({'_id': user_id})
 
     if not document:
-        return {'message': 'user not found'}, 404
+        return {'message': f'user \'{user_id}\'  not found'}, 404
 
     db.update_one({'_id': user_id}, {
         '$set': {
@@ -92,7 +102,7 @@ async def delete_user(user_id):
     document = db.find_one({'_id': user_id})
 
     if not document:
-        return {'message': 'user not found'}, 404
+        return {'message': f'user \'{user_id}\'  not found'}, 404
 
     db.delete_one({'_id': user_id})
 
