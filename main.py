@@ -24,22 +24,22 @@ class User(BaseModel):
     name: str
     password: str
 
-    money: int = 0
     admin: bool = False
 
 
 try:
     client = MongoClient('mongodb://localhost:27017/')
-    db = client['current']['purchase']
+    db = client['user']['production']
 except Exception as exception:
     print(f"Error connecting to MongoDB: {exception}")
 
 
 # user create
 
+
 @app.post(
     '/user',
-    description='Creates a new user with the provided name, password, money, and admin status.',
+    description='Creates a new user with the provided name, password, and admin status.',
     response_description='Returns a success message upon creation.',
 )
 async def create_user(user: User):
@@ -51,7 +51,6 @@ async def create_user(user: User):
         'name': user.name,
         'password': user.password,
 
-        'money': user.money,
         'admin': user.admin
     })
 
@@ -94,7 +93,6 @@ async def update_user(user_id: str, user: User):
             'name': user.name,
             'password': user.password,
 
-            'money': user.money,
             'admin': user.admin
         }
     })
@@ -155,7 +153,6 @@ async def create_user(user: User):
         'name': user.name,
         'password': user.password,
 
-        'money': 0,
         'admin': False
     })
 
